@@ -3,6 +3,6 @@
 This is the core for writing new plugin for Habari App
 
 ## Available Plugins
-Directory
+[Directory](https://github.com/Qazima/habari-plugin-directory)
 
-Mail
+[Mail](https://github.com/Qazima/habari-plugin-mail)
