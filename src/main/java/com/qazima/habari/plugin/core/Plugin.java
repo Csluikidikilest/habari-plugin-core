@@ -1,6 +1,7 @@
 package com.qazima.habari.plugin.core;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,7 +13,8 @@ import org.apache.http.HttpStatus;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "connectionType")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "connectionType")
+@JsonPropertyOrder({"connectionType", "configuration" })
 @JsonTypeName("com.qazima.habari.plugin.core.Plugin")
 public abstract class Plugin {
     @Getter
