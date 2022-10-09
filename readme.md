@@ -8,3 +8,5 @@ This is the core for writing new plugin for Habari App
 [Image](https://github.com/Qazima/habari-plugin-image)
 
 [Mail](https://github.com/Qazima/habari-plugin-mail)
+
+[Web services](https://github.com/Qazima/habari-plugin-webservices)
