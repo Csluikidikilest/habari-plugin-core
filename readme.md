@@ -10,3 +10,6 @@ This is the core for writing new plugin for Habari App
 [Mail](https://github.com/Qazima/habari-plugin-mail)
 
 [Web services](https://github.com/Qazima/habari-plugin-webservices)
+
+## Status
+[![Build](https://github.com/Qazima/habari-plugin-core/actions/workflows/maven-build.yml/badge.svg?branch=master)](https://github.com/Qazima/habari-plugin-core/actions/workflows/maven-build.yml)
