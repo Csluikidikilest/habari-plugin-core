@@ -13,3 +13,4 @@ This is the core for writing new plugin for Habari App
 
 ## Status
 [![Build](https://github.com/Qazima/habari-plugin-core/actions/workflows/maven-build.yml/badge.svg?branch=master)](https://github.com/Qazima/habari-plugin-core/actions/workflows/maven-build.yml)
+[![Publish Package](https://github.com/Qazima/habari-plugin-core/actions/workflows/maven-publish-package.yml/badge.svg?branch=v0.1)](https://github.com/Qazima/habari-plugin-core/actions/workflows/maven-publish-package.yml)
