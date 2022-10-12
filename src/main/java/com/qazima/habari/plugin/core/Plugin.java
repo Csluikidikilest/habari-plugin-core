@@ -11,7 +11,11 @@ import lombok.Setter;
 import org.apache.http.HttpStatus;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+import static java.util.stream.Collectors.*;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "connectionType")
 @JsonPropertyOrder({"connectionType", "configuration" })
@@ -25,6 +29,51 @@ public abstract class Plugin {
     @Setter
     @JsonProperty("connectionType")
     private String connectionType;
+
+    protected boolean isNullOrEmpty(String string) {
+        return string == null || string.isEmpty();
+    }
+
+    protected boolean isNullOrWhiteSpace(String string) {
+        return isNullOrEmpty(string) || string.trim().isEmpty();
+    }
+
+    protected Map<String, List<String>> splitRequestBody(String parameters) throws IOException {
+        Map<String, String> temp = Collections.emptyMap();
+        Map<String, List<String>> result = Collections.emptyMap();
+        if (!isNullOrWhiteSpace(parameters)) {
+            ObjectMapper mapper = new ObjectMapper();
+            temp = mapper.readValue(parameters, Map.class);
+        }
+
+        for (Map.Entry<String, String> element : temp.entrySet()) {
+            if(!result.containsKey(element.getKey())) {
+                result.put(element.getKey(), new ArrayList<>());
+            }
+            result.get(element.getKey()).add(element.getValue());
+        }
+
+        return result;
+    }
+
+    protected Map<String, List<String>> splitQuery(String parameters) {
+        if (isNullOrWhiteSpace(parameters)) {
+            return Collections.emptyMap();
+        }
+        return Arrays.stream(parameters.split("&"))
+                .map(this::splitQueryParameter)
+                .collect(groupingBy(AbstractMap.SimpleImmutableEntry::getKey, LinkedHashMap::new, mapping(Map.Entry::getValue, toList())));
+    }
+
+    protected AbstractMap.SimpleImmutableEntry<String, String> splitQueryParameter(String it) {
+        final int idx = it.indexOf("=");
+        final String key = idx > 0 ? it.substring(0, idx) : it;
+        final String value = idx > 0 && it.length() > idx + 1 ? it.substring(idx + 1) : null;
+        return new AbstractMap.SimpleImmutableEntry<>(
+                URLDecoder.decode(key, StandardCharsets.UTF_8),
+                URLDecoder.decode(value, StandardCharsets.UTF_8)
+        );
+    }
 
     public int process(HttpExchange httpExchange, Content content) {
         content = new Content();
