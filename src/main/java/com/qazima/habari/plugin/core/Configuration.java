@@ -11,6 +11,9 @@ import lombok.Setter;
 
 import java.util.Optional;
 
+/**
+ *
+ */
 @JsonPropertyOrder(alphabetic = true)
 public class Configuration {
     @Getter
