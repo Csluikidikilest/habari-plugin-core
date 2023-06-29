@@ -1,0 +1,3 @@
+com.qazima.habari.plugin.core
+com.qazima.habari.plugin.core.deserializer
+com.qazima.habari.plugin.core.serializer

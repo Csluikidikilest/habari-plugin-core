@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.qazima.habari.plugin.core"},{"l":"com.qazima.habari.plugin.core.deserializer"},{"l":"com.qazima.habari.plugin.core.serializer"}];updateSearchResults();

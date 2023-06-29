@@ -17,8 +17,15 @@ import java.util.*;
 
 import static java.util.stream.Collectors.*;
 
+/**
+ * <p>
+ * Abstract class Plugin used to create new plugin for Habari.
+ *
+ * @author Clement BONET
+ * @version 1.0.0
+ */
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "connectionType")
-@JsonPropertyOrder({"connectionType", "configuration" })
+@JsonPropertyOrder({"connectionType", "configuration"})
 @JsonTypeName("com.qazima.habari.plugin.core.Plugin")
 public abstract class Plugin {
     @Getter
@@ -30,14 +37,68 @@ public abstract class Plugin {
     @JsonProperty("connectionType")
     private String connectionType;
 
+    /**
+     * <p>
+     * A string test to assert that the string is null or empty.
+     *
+     * @param string The string to test.
+     * @return True if the string is null or empty, false otherwise.
+     * @author Clement BONET
+     * @version 1.0.0
+     */
     protected boolean isNullOrEmpty(String string) {
         return string == null || string.isEmpty();
     }
 
+    /**
+     * <p>
+     * A string test to assert that the string is null or contains only spaces (character 0x20).
+     *
+     * @param string The string to test.
+     * @return True if the string is null or contains only spaces (character 0x20), false otherwise.
+     * @author Clement BONET
+     * @version 1.0.0
+     */
     protected boolean isNullOrWhiteSpace(String string) {
         return isNullOrEmpty(string) || string.trim().isEmpty();
     }
 
+    /**
+     * <p>
+     * Convert the parameters from a query string from a post/put call into a map of key/list of values.
+     * <p>
+     * <b>IE:</b> the query string: <code>[...]/index.html?param1=value1&amp;param2=value2&amp;param2=value3&amp;param3&amp;param4=</code>
+     * will produce the following map with the values.
+     * <ul>
+     *     <li>param1
+     *         <ul>
+     *             <li>value1</li>
+     *         </ul>
+     *     </li>
+     *     <li>param2
+     *         <ul>
+     *             <li>value2</li>
+     *             <li>value3</li>
+     *         </ul>
+     *     </li>
+     *     <li>param3
+     *         <ul>
+     *             <li><i>no value</i></li>
+     *         </ul>
+     *     </li>
+     *     <li>param4
+     *         <ul>
+     *             <li><i>no value</i></li>
+     *         </ul>
+     *     </li>
+     * </ul>
+     *
+     * @param parameters the query string to convert.
+     * @return The computed map.
+     * @throws IOException Any I/O exception raised by the transformation.
+     * @author Clement BONET
+     * @version 1.0.0
+     */
     protected Map<String, List<String>> splitRequestBody(String parameters) throws IOException {
         Map<String, String> temp = Collections.emptyMap();
         Map<String, List<String>> result = Collections.emptyMap();
@@ -47,7 +108,7 @@ public abstract class Plugin {
         }
 
         for (Map.Entry<String, String> element : temp.entrySet()) {
-            if(!result.containsKey(element.getKey())) {
+            if (!result.containsKey(element.getKey())) {
                 result.put(element.getKey(), new ArrayList<>());
             }
             result.get(element.getKey()).add(element.getValue());
@@ -56,6 +117,41 @@ public abstract class Plugin {
         return result;
     }
 
+    /**
+     * <p>
+     * Convert the parameters from a query string from a get call into a map of key/list of values.
+     * <p>
+     * <b>IE:</b> the query string: <code>[...]/index.html?param1=value1&amp;param2=value2&amp;param2=value3&amp;param3&amp;param4=</code>
+     * will produce the following map with the values.
+     * <ul>
+     *     <li>param1
+     *         <ul>
+     *             <li>value1</li>
+     *         </ul>
+     *     </li>
+     *     <li>param2
+     *         <ul>
+     *             <li>value2</li>
+     *             <li>value3</li>
+     *         </ul>
+     *     </li>
+     *     <li>param3
+     *         <ul>
+     *             <li><i>no value</i></li>
+     *         </ul>
+     *     </li>
+     *     <li>param4
+     *         <ul>
+     *             <li><i>no value</i></li>
+     *         </ul>
+     *     </li>
+     * </ul>
+     *
+     * @param parameters the query string to convert.
+     * @return The computed map.
+     * @author Clement BONET
+     * @version 1.0.0
+     */
     protected Map<String, List<String>> splitQuery(String parameters) {
         if (isNullOrWhiteSpace(parameters)) {
             return Collections.emptyMap();
@@ -65,6 +161,29 @@ public abstract class Plugin {
                 .collect(groupingBy(AbstractMap.SimpleImmutableEntry::getKey, LinkedHashMap::new, mapping(Map.Entry::getValue, toList())));
     }
 
+    /**
+     * <p>
+     * Convert a couple <code>param=value</code> into a entry key, value
+     * to store it in the map.
+     * <p>
+     * <b>IE:</b>
+     * <ul>
+     *     <li>
+     *         <code>param=value</code> will return key=param and value=value
+     *     </li>
+     *     <li>
+     *         <code>param</code> will return key=param and value=null
+     *     </li>
+     *     <li>
+     *         <code>param=</code> will return key=param and value=null
+     *     </li>
+     * </ul>
+     *
+     * @param it The parameter to compute.
+     * @return The computed map entry.
+     * @author Clement BONET
+     * @version 1.0.0
+     */
     protected AbstractMap.SimpleImmutableEntry<String, String> splitQueryParameter(String it) {
         final int idx = it.indexOf("=");
         final String key = idx > 0 ? it.substring(0, idx) : it;
@@ -75,6 +194,16 @@ public abstract class Plugin {
         );
     }
 
+    /**
+     * <p>
+     * Process the standard query from uri configured in the standard field.
+     *
+     * @param httpExchange The current http exchange.
+     * @param content The content from the previous call and the content given to the following one.
+     * @return The http status code.
+     * @author Clement BONET
+     * @version 1.0.0
+     */
     public int process(HttpExchange httpExchange, Content content) {
         content = new Content();
         content.setType("text/plain");
@@ -87,6 +216,16 @@ public abstract class Plugin {
         return content.getStatusCode();
     }
 
+    /**
+     * <p>
+     * Process the standard query from uri configured in the configure field.
+     *
+     * @param httpExchange The current http exchange.
+     * @param content The content from the previous call and the content given to the following one.
+     * @return The http status code.
+     * @author Clement BONET
+     * @version 1.0.0
+     */
     public int processConfigure(HttpExchange httpExchange, Content content) {
         content = new Content();
         content.setType("application/json");
@@ -103,6 +242,16 @@ public abstract class Plugin {
         return content.getStatusCode();
     }
 
+    /**
+     * <p>
+     * Process the standard query from uri configured in the metadata field.
+     *
+     * @param httpExchange The current http exchange.
+     * @param content The content from the previous call and the content given to the following one.
+     * @return The http status code.
+     * @author Clement BONET
+     * @version 1.0.0
+     */
     public int processMetadata(HttpExchange httpExchange, Content content) {
         content = new Content();
         content.setType("text/plain");
